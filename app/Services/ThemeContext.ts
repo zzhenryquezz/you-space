@@ -1,5 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import VideoListener from 'App/Listeners/VideoListener'
+import VideoRepository from 'App/Repositories/VideoRepository'
 
 export class ThemeContext {
   public user?: Record<string, any>
@@ -25,11 +25,11 @@ export class ThemeContext {
       instance.permissions = (await auth.user.findPermissions()).map((p) => p.name)
     }
 
-    const listener = new VideoListener(instance.permissions)
+    const repository = VideoRepository.withPermissions(instance.permissions)
 
     instance.videos = {
-      index: listener.index.bind(listener),
-      show: listener.show.bind(listener),
+      index: repository.index.bind(repository),
+      // show: repository.show.bind(repository),
     }
 
     return instance
