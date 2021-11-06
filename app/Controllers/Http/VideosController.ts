@@ -8,8 +8,11 @@ import VideoUploadValidator from 'App/Validators/VideoUploadValidator'
 import { Queue } from 'App/Queue'
 import { cuid } from '@ioc:Adonis/Core/Helpers'
 import VideoListener from 'App/Listeners/VideoListener'
+import VideoRepository from 'App/Repositories/VideoRepository'
 
 export default class VideosController {
+  constructor(public repository = VideoRepository) {}
+
   public async index({ request, auth }: HttpContextContract) {
     let permissions: string[] = []
 
@@ -17,9 +20,7 @@ export default class VideosController {
       permissions = (await auth.user.findPermissions()).map((p) => p.name)
     }
 
-    const listener = new VideoListener(permissions)
-
-    return listener.index(request.qs())
+    return await this.repository.withPermissions(permissions).index(request.qs())
   }
 
   public async show({ request, response, auth, params }: HttpContextContract) {
